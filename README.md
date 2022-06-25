@@ -200,7 +200,7 @@
 
 ```$ docker-compose exec web python manage.py collectstatic --no-input```
 
-:white: Останавливаем контейнеры:
+:white_check_mark: Останавливаем контейнеры:
 
 ```$ docker-compose down -v```
 
