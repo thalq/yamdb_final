@@ -180,9 +180,29 @@
 
 ```$ pip install -r api_yamdb/requirements.txt```
 
-:white_check_mark: Создаём и применяем миграции:
+ :white_check_mark: Переходим в папку Docker-compose.yaml:
 
-```$ python manage.py makemigrations``` затем ```$ python manage.py migrate```
+```$ cd infra```
+
+ :white_check_mark: Поднимаем контейнеры:
+
+```$ docker-compose up -d --build```
+
+:white_check_mark: Выполняем миграции:
+
+```$ docker-compose exec web python manage.py makemigrations reviews``` затем ```$ docker-compose exec web python manage.py migrate --run-syncdb```
+
+:white_check_mark: Создаем суперпользователя:
+
+```$ docker-compose exec web python manage.py createsuperuser```
+
+:white_check_mark: Собираем статику:
+
+```$ docker-compose exec web python manage.py collectstatic --no-input```
+
+:white: Останавливаем контейнеры:
+
+```$ docker-compose down -v```
 
 ----
 
