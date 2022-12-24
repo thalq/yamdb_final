@@ -1,317 +1,112 @@
+# CI/CD для проекта API YAMDB
 
-![yamdb_final](https://github.com/thalq/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
+## Технологический стек
+[![Django-app workflow](https://github.com/DeffronMax/yamdb_final/actions/workflows/main.yml/badge.svg)](https://github.com/DeffronMax/yamdb_final/actions/workflows/main.yml)
+[![Python](https://img.shields.io/badge/-Python-464646?style=flat&logo=Python&logoColor=56C0C0&color=008080)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/-Django-464646?style=flat&logo=Django&logoColor=56C0C0&color=008080)](https://www.djangoproject.com/)
+[![Django REST Framework](https://img.shields.io/badge/-Django%20REST%20Framework-464646?style=flat&logo=Django%20REST%20Framework&logoColor=56C0C0&color=008080)](https://www.django-rest-framework.org/)
+[![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-464646?style=flat&logo=PostgreSQL&logoColor=56C0C0&color=008080)](https://www.postgresql.org/)
+[![JWT](https://img.shields.io/badge/-JWT-464646?style=flat&color=008080)](https://jwt.io/)
+[![Nginx](https://img.shields.io/badge/-NGINX-464646?style=flat&logo=NGINX&logoColor=56C0C0&color=008080)](https://nginx.org/ru/)
+[![gunicorn](https://img.shields.io/badge/-gunicorn-464646?style=flat&logo=gunicorn&logoColor=56C0C0&color=008080)](https://gunicorn.org/)
+[![Docker](https://img.shields.io/badge/-Docker-464646?style=flat&logo=Docker&logoColor=56C0C0&color=008080)](https://www.docker.com/)
+[![Docker-compose](https://img.shields.io/badge/-Docker%20compose-464646?style=flat&logo=Docker&logoColor=56C0C0&color=008080)](https://www.docker.com/)
+[![Docker Hub](https://img.shields.io/badge/-Docker%20Hub-464646?style=flat&logo=Docker&logoColor=56C0C0&color=008080)](https://www.docker.com/products/docker-hub)
+[![GitHub%20Actions](https://img.shields.io/badge/-GitHub%20Actions-464646?style=flat&logo=GitHub%20actions&logoColor=56C0C0&color=008080)](https://github.com/features/actions)
+[![Yandex.Cloud](https://img.shields.io/badge/-Yandex.Cloud-464646?style=flat&logo=Yandex.Cloud&logoColor=56C0C0&color=008080)](https://cloud.yandex.ru/)
 
-# Финальный проект «yamdb_final»
 
-## Описание проекта
-> *Этот API даёт возможность взаимодействовать с сайтом и пользоваться функционалом, не заходя на сайт. В нём доступны следующие действия:*
-----
+## Workflow
+* tests - Проверка кода на соответствие стандарту PEP8 (с помощью пакета flake8) и запуск pytest. Дальнейшие шаги выполнятся только если push был в ветку master или main.
+* build_and_push_to_docker_hub - Сборка и доставка докер-образов на Docker Hub
+* deploy - Автоматический деплой проекта на боевой сервер. Выполняется копирование файлов из репозитория на сервер:
+* send_message - Отправка уведомления в Telegram
 
-### :closed_lock_with_key: AUTH
-###### _Регистрация пользователей и выдача токенов_
-
-**Регистрация нового пользователя**
-- Получить код подтверждения на переданный email.
-- Права доступа: Доступно без токена.
-- Использовать имя 'me' в качестве username запрещено.
-- Поля email и username должны быть уникальными.
-
-**Получение JWT-токена**
-- Получение JWT-токена в обмен на username и confirmation code.
-- Права доступа: Доступно без токена.
-----
-
-### :cinema: CATEGORIES
-###### _Категории (типы) произведений_
-
-**Получение списка всех категорий**
-- Получить список всех категорий
-- Права доступа: Доступно без токена
-
-**Добавление новой категории**
-- Создать категорию.
-- Права доступа: Администратор.
-- Поле slug каждой категории должно быть уникальным.
-
-**Удаление категории**
-- Удалить категорию.
-- Права доступа: Администратор.
-----
-
-### :performing_arts: GENRES
-###### _Категории жанров_
-
-**Получение списка всех жанров**
-- Получить список всех жанров.
-- Права доступа: Доступно без токена
-
-**Добавление жанра**
-- Добавить жанр.
-- Права доступа: Администратор.
-- Поле slug каждого жанра должно быть уникальным.
-
-**Удаление жанра**
-- Удалить жанр.
-- Права доступа: Администратор.
-----
-
-### :clapper: TITLES
-###### _Произведения, к которым пишут отзывы (определённый фильм, книга или песенка)_
-
-**Получение списка всех произведений**
-- Получить список всех объектов.
-- Права доступа: Доступно без токена
-
-**Добавление произведения**
-- Добавить новое произведение.
-- Права доступа: Администратор.
-- Нельзя добавлять произведения, которые еще не вышли (год выпуска не может быть больше текущего).
-- При добавлении нового произведения требуется указать уже существующие категорию и жанр.
-
-**Получение информации о произведении**
-- Информация о произведении
-- Права доступа: Доступно без токена
-
-**Частичное обновление информации о произведении**
-- Обновить информацию о произведении
-- Права доступа: Администратор
-
-**Удаление произведения**
-- Удалить произведение.
-- Права доступа: Администратор.
-----
-
-### :pencil: REVIEWS
-
-###### _Отзывы_
-
-**Получение списка всех отзывов**
-- Получить список всех отзывов.
-- Права доступа: Доступно без токена.
-
-**Добавление нового отзыва**
-- Добавить новый отзыв. Пользователь может оставить только один отзыв на произведение.
-- Права доступа: Аутентифицированные пользователи.
-
-**Полуение отзыва по id**
-- Получить отзыв по id для указанного произведения.
-- Права доступа: Доступно без токена.
-
-**Частичное обновление отзыва по id**
-- Частично обновить отзыв по id.
-- Права доступа: Автор отзыва, модератор или администратор.
-
-**Удаление отзыва по id**
-- Удаление отзыва по id
-- Права доступа: Автор отзыва, модератор или администратор.
-----
-
-### :+1::-1:COMMENTS
-
-###### _Комментарии к отзывам_
-
-**Получение списка всех комментариев к отзыву**
-- Получить список всех комментариев к отзыву по id
-- Права доступа: Доступно без токена.
-
-**Добавление комментария к отзыву**
-- Добавить новый комментарий для отзыва.
-- Права доступа: Аутентифицированные пользователи.
-
-**Получение комментария к отзыву**
-- Получить комментарий для отзыва по id.
-- Права доступа: Доступно без токена.
-
-**Частичное обновление комментария к отзыву**
-- Частично обновить комментарий к отзыву по id.
-- Права доступа: Автор комментария, модератор или администратор.
-
-**Удаление комментария к отзыву**
-- Удалить комментарий к отзыву по id.
-- Права доступа: Автор комментария, модератор или администратор.
-----
-
-### :bowtie: USERS
-
-###### _Пользователи_
-
-**Получение списка всех пользователей**
-- Получить список всех пользователей.
-- Права доступа: Администратор
-
-**Добавление пользователя**
-- Добавить нового пользователя.
-- Права доступа: Администратор
-- Поля email и username должны быть уникальными.
-
-**Получение пользователя по username**
-- Получить пользователя по username.
-- Права доступа: Администратор
-
-**Изменение данных пользователя по username**
-- Изменить данные пользователя по username.
-- Права доступа: Администратор.
-- Поля email и username должны быть уникальными.
-
-**Удаление пользователя по username**
-- Удалить пользователя по username.
-- Права доступа: Администратор.
-
-**Получение данных своей учетной записи**
-- Получить данные своей учетной записи
-- Права доступа: Любой авторизованный пользователь
-
-**Изменение данных своей учетной записи**
-- Изменить данные своей учетной записи
-- Права доступа: Любой авторизованный пользователь
-- Поля email и username должны быть уникальными.
-----
-
-## :wrench: Установка
-:white_check_mark: Клонируем репозиторий:
-
-```$ git clone git@github.com:thalq/yamdb_final.git```
-
-:white_check_mark:  Создаем виртуальное окружение:
- 
- ```$ python -m venv venv```
- 
- :white_check_mark: Устанавливаем зависимости:
-
-```$ pip install -r api_yamdb/requirements.txt```
-
- :white_check_mark: Переходим в папку Docker-compose.yaml:
-
-```$ cd infra```
-
- :white_check_mark: Поднимаем контейнеры:
-
-```$ docker-compose up -d --build```
-
-:white_check_mark: Выполняем миграции:
-
-```$ docker-compose exec web python manage.py makemigrations reviews``` затем ```$ docker-compose exec web python manage.py migrate --run-syncdb```
-
-:white_check_mark: Создаем суперпользователя:
-
-```$ docker-compose exec web python manage.py createsuperuser```
-
-:white_check_mark: Собираем статику:
-
-```$ docker-compose exec web python manage.py collectstatic --no-input```
-
-:white_check_mark: Останавливаем контейнеры:
-
-```$ docker-compose down -v```
-
-----
-
-## :bulb: Примеры
-**_1. Перейти на страницу администратора_**
-
+### Подготовка для запуска workflow
+Создайте и активируйте виртуальное окружение, обновите pip:
 ```
-http://84.201.162.216/admin/
+python3 -m venv venv
+. venv/bin/activate
+python3 -m pip install --upgrade pip
+```
+Запустите автотесты:
+```
+pytest
+```
+Отредактируйте файл `nginx/default.conf` и в строке `server_name` впишите IP виртуальной машины (сервера).  
+Скопируйте подготовленные файлы `docker-compose.yaml` и `nginx/default.conf` из вашего проекта на сервер:
+
+Зайдите в репозиторий на локальной машине и отправьте файлы на сервер.
+Можно сделать 2умя способами, первый склонировав репозиторий, переместив нужные файлы командой mv
+после чего удалить остаток
+```
+rm -rf hw05_final
+```
+Или 2ой вариант:
+```
+scp docker-compose.yaml <username>@<host>/home/<username>/docker-compose.yaml
+sudo mkdir nginx
+scp default.conf <username>@<host>/home/<username>/nginx/default.conf
+```
+В репозитории на Гитхабе добавьте данные в `Settings - Secrets - Actions secrets`:
+```
+DOCKER_USERNAME - имя пользователя в DockerHub
+DOCKER_PASSWORD - пароль пользователя в DockerHub
+HOST - ip-адрес сервера
+USER - пользователь
+SSH_KEY - приватный ssh-ключ (публичный должен быть на сервере)
+PASSPHRASE - кодовая фраза для ssh-ключа
+DB_ENGINE - django.db.backends.postgresql
+DB_HOST - db
+DB_PORT - 5432
+SECRET_KEY - секретный ключ приложения django (необходимо чтобы были экранированы или отсутствовали скобки)
+ALLOWED_HOSTS - список разрешённых адресов
+TELEGRAM_TO - id своего телеграм-аккаунта (можно узнать у @userinfobot, команда /start)
+TELEGRAM_TOKEN - токен бота (получить токен можно у @BotFather, /token, имя бота)
+DB_NAME - postgres (по умолчанию)
+POSTGRES_USER - postgres (по умолчанию)
+POSTGRES_PASSWORD - postgres (по умолчанию)
 ```
 
-**_2. Перейти на страницу redoc_**
+## Как запустить проект на сервере:
+
+
+Установите Docker и Docker-compose:
+```
+sudo apt install docker.io
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+Проверьте корректность установки Docker-compose:
+```
+sudo  docker-compose --version
+```
+Создайте папку `nginx`:
+```
+mkdir nginx
+```
+### После успешного деплоя:
+Соберите статические файлы (статику):
+```
+docker-compose exec web python manage.py collectstatic --no-input
+```
+Примените миграции:
+```
+docker-compose exec web python manage.py makemigrations
+docker-compose exec web python manage.py migrate --noinput
+```
+Создайте суперпользователя:
+```
+docker-compose exec web python manage.py createsuperuser
 
 ```
-http://84.201.162.216/redoc/
+или
+```
+docker-compose exec web python manage.py loaddata fixtures.json
 ```
 
-### Для формирования запросов и ответов использована программа [Postman](https://www.postman.com/).
 
-**_3. Получение списка всех произведений_**
-
-###### _Передаем GET-запрос к эедпоинту TITLES:_
-```
-http://84.201.162.216/api/v1/titles/
-```
-
-<p align="center">:arrow_down:<p align="center">
- 
-```
-[
-  {
-    "count": 0,
-    "next": "string",
-    "previous": "string",
-    "results": [
-      {
-        "id": 0,
-        "name": "string",
-        "year": 0,
-        "rating": 0,
-        "description": "string",
-        "genre": [
-          {
-            "name": "string",
-            "slug": "string"
-          }
-        ],
-        "category": {
-          "name": "string",
-          "slug": "string"
-        }
-      }
-    ]
-  }
-]
-```
- 
- 
-**_4. Регистрация нового пользователя_**
- 
-######  _Передаем POST-запрос на эндпоинт AUTH_
-```
- http://84.201.162.216/api/v1/auth/signup/
- ```
- 
- ######  _с параметрами:_
- 
- ```
- {
-  "email": "string",
-  "username": "string"
-}
- ```
- 
- <p align="center">:arrow_down:<p align="center">
-  
- ```
-{
-  "email": "string",
-  "username": "string"
-}
-```
-  
-  
-**_5. Полуение отзыва по id_**
-  
-###### _Передаем GET-запрос к эедпоинту REVIEWS_
-  
-```
-http://84.201.162.216/api/v1/titles/{title_id}/reviews/{review_id}/
-```
-  
-<p align="center">:arrow_down:<p align="center">
-
-```
-[
-  {
-    "count": 0,
-    "next": "string",
-    "previous": "string",
-    "results": [
-      {
-        "id": 0,
-        "text": "string",
-        "author": "string",
-        "score": 1,
-        "pub_date": "2019-08-24T14:15:22Z"
-      }
-    ]
-  }
-]
-```
- 
+## Развёрнутый проект
+http://62.84.120.240/api/v1/
+http://62.84.120.240/admin/
+http://62.84.120.240/redoc/
